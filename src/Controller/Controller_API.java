@@ -5,6 +5,7 @@ import javafx.stage.Stage;
 import View.*;
 import java.io.File;
 import Model.*;
+import org.w3c.dom.Element;
 
 public class Controller_API {
     public static final String DATA_FILE_EXTENSION= "*.xml";
@@ -18,27 +19,23 @@ public class Controller_API {
 
     public void start(Stage mainStage){
         var dataFile = myChooser.showOpenDialog(mainStage);
-        while(dataFile!=null){
-            try{
+        XMLParser parser = new XMLParser("type");
+        Element root = parser.getRoot(dataFile,"type");
 
-            }
-            catch {
-                var
-            }
-        }
         Stage myStage = mainStage;
-        var xmlObj = parse_XML(XMLDIR);
 
 
-        setUp(Stage, xmlObj);
+
+        setUp(mainStage, root);
 
     }
 
-    private void setUp(Stage mainStage, var xmlObj){
+    private void setUp(Stage mainStage, Element root){
         //retrieve parameters needed to build a new Simulation
-        int initialSize = xmlObj.getLabel("size");
-        double ratio = xmlObj.getLabel("ratio");
-        String type = xmlObj.getLabel("type");
+        int initialWidth = root.getAttribute("width");
+        int initialLength = root.getElementsByTagName("");
+        double ratio = root.getElementsByTagName();
+        String type = root.getElementsByTagName();
 
         //build a new simulation
         Simulation initialSimulation = Simulation(size, ratio, type);
@@ -85,10 +82,5 @@ public class Controller_API {
         result.getExtensionFilters().setAll(new FileChooser.ExtensionFilter("Text files",extension));
         return result;
     }
-
-    private XMLOBJ parse_XML(String directory){
-        //return an XMLOBJ
-    }
-
 
 }

@@ -36,17 +36,13 @@ public class XMLParser {
     /**
      * Get the data contained in this XML file as an object
      */
-    public Game getGame(File dataFile) {
+    public Element getRoot(File dataFile, String DATA_TYPE) {
         var root = getRootElement(dataFile);
-        if (! isValidFile(root, Game.DATA_TYPE)) {
-            throw new XMLException(ERROR_MESSAGE, Game.DATA_TYPE);
+        if (! isValidFile(root, DATA_TYPE)) {
+            throw new XMLException(ERROR_MESSAGE, DATA_TYPE);
         }
         // read data associated with the fields given by the object
-        var results = new HashMap<String, String>();
-        for (var field : Game.DATA_FIELDS) {
-            results.put(field, getTextValue(root, field));
-        }
-        return new Game(results);
+        return root;
     }
 
     // Get root element of an XML file
