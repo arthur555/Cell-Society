@@ -4,16 +4,18 @@ import javafx.animation.Timeline;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import View.CellGridPane;
-import Model.GameOfLifeSimulation;
-import Model.WatorSimulation;
-import Model.FireSimulation;
-import Model.SegregationSimulation;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import Model.Simulation;
-import Model.*;
+import Model.SegregationSimulation;
+import Model.FireSimulation;
+import Model.WatorSimulation;
+import Model.GameOfLifeSimulation;
+import Model.Point;
+
+
 import javafx.util.Duration;
 
 /*
@@ -42,6 +44,7 @@ public class Controller {
     public static final String DEFAULT_SHARK_RATE = "5";
     public static final String FISH_RATE = "fishRate";
     public static final String DEFAULT_FISH_RATE = "50";
+
     public static final String FILE_CHOOSER_PROMPT = "Choose data file";
     private FileChooser myChooser = makeChooser(DATA_FILE_EXTENSION);
     private Timeline myTime;
@@ -58,6 +61,7 @@ public class Controller {
 
     public void start(){
         var dataFile = myChooser.showOpenDialog(null);
+
         XMLParser parser = new XMLParser(GAME_TYPE);
         Map<String, String> attributes = parser.getAttribute(dataFile);
         originalAttributes = attributes;
@@ -65,13 +69,19 @@ public class Controller {
     }
 
     public void setUp(Map<String, String> attributes, boolean isReset){
-        int speed = initializeSimulation(attributes, isReset);
+        int speed = createSimulation(attributes, isReset);
         myView = new CellGridPane(gridPane);
         myView.create(attributes, mySimulation);
-        createTime(speed);
+        if(myTime==null){
+            var frame = new KeyFrame(Duration.millis(FPS_DIVISION/(speed+SPEEDBUFF)),e->step());
+            myTime = new Timeline();
+            myTime.setCycleCount(Timeline.INDEFINITE);
+            myTime.getKeyFrames().add(frame);
+            myTime.play();
+        }
     }
 
-    private int initializeSimulation(Map<String, String> attributes, boolean isReset) {
+    private int createSimulation(Map<String, String> attributes, boolean isReset) {
         int numRows = Integer.parseInt(attributes.get(NUM_ROW_ATTR));
         int numColumns = Integer.parseInt(attributes.get(NUM_COL_ATTR));
         double cellRatio = Double.parseDouble(attributes.getOrDefault(CELL_RATIO, DEFAULT_RATIO));
@@ -81,6 +91,7 @@ public class Controller {
         String type = attributes.get(TYPE);
         int sharkRate = Integer.parseInt(attributes.getOrDefault(SHARK_RATE, DEFAULT_SHARK_RATE));
         int fishRate = Integer.parseInt(attributes.getOrDefault(FISH_RATE, DEFAULT_FISH_RATE));
+
         if(isReset){
             mySimulation = getSimulation(numRows, numColumns,type, threshold, beginningStageMap, fishRate, sharkRate);
         }
@@ -92,20 +103,10 @@ public class Controller {
         return speed;
     }
 
-    private void createTime(int speed) {
-        if(myTime==null){
-            var frame = new KeyFrame(Duration.millis(FPS_DIVISION/(speed+SPEEDBUFF)), e->step());
-            myTime = new Timeline();
-            myTime.setCycleCount(Timeline.INDEFINITE);
-            myTime.getKeyFrames().add(frame);
-            myTime.play();
-        }
-    }
-
     public void update(Map<String, String> map){
         for(Map.Entry s: map.entrySet())
         {
-            s.setValue(map.get(s.getKey()));
+            originalAttributes.put(s.getKey().toString(), s.getValue().toString());
         }
         setUp(originalAttributes, false);
     }
