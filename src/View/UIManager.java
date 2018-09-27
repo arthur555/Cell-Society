@@ -1,6 +1,6 @@
 package View;
 
-import Controller.Controller_API;
+import Controller.Controller;
 import javafx.fxml.FXML;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
@@ -27,7 +27,7 @@ public class UIManager {
     @FXML
     public GridPane gridPane;
 
-    private Controller_API controller;
+    private Controller controller;
     private static final int MAX_FPS = 30;
     private static final String DEFAULT_SIZE = "20";
     private static final int HUNDRED = 100;
@@ -39,7 +39,7 @@ public class UIManager {
     public void initialize(){
         forceInputToBeNumeric(widthTextField);
         forceInputToBeNumeric(heightTextField);
-        controller = new Controller_API(gridPane);
+        controller = new Controller(gridPane);
         controller.start();
     }
 
@@ -60,9 +60,9 @@ public class UIManager {
     // you can get the updated value from the user input fields from this method
     public void handleApplyButtonAction(){
         Map<String, String> attributes = new HashMap<>();
-        attributes.put(Controller_API.NUM_ROW_ATTR, getOrDefaultValue(heightTextField.getText()) );
-        attributes.put(Controller_API.NUM_COL_ATTR, getOrDefaultValue(widthTextField.getText()) );
-        attributes.put(Controller_API.FPS, String.valueOf((int)((slider.getValue()/HUNDRED)*MAX_FPS)));
+        attributes.put(Controller.NUM_ROW_ATTR, getOrDefaultValue(heightTextField.getText()) );
+        attributes.put(Controller.NUM_COL_ATTR, getOrDefaultValue(widthTextField.getText()) );
+        attributes.put(Controller.FPS, String.valueOf((int)((slider.getValue()/HUNDRED)*MAX_FPS)));
         if(oldNumCols!=Integer.parseInt(widthTextField.getText())||oldNumRows!=Integer.parseInt(heightTextField.getText())){
             oldNumCols = Integer.parseInt(widthTextField.getText());
             oldNumRows = Integer.parseInt(heightTextField.getText());

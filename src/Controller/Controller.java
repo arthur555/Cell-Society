@@ -3,14 +3,17 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
-import View.*;
+import View.CellGridPane;
+import Model.GameOfLifeSimulation;
+import Model.WatorSimulation;
+import Model.FireSimulation;
+import Model.SegregationSimulation;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import Model.Simulation;
 import Model.*;
-
 import javafx.util.Duration;
 
 /*
@@ -18,7 +21,7 @@ import javafx.util.Duration;
     @author xp19
  */
 
-public class Controller_API{
+public class Controller {
     public static final String DATA_FILE_EXTENSION = "*.xml";
     public static final int SPEEDBUFF = 1;
     public static final String NUM_ROW_ATTR = "numRows";
@@ -39,7 +42,6 @@ public class Controller_API{
     public static final String DEFAULT_SHARK_RATE = "5";
     public static final String FISH_RATE = "fishRate";
     public static final String DEFAULT_FISH_RATE = "50";
-
     public static final String FILE_CHOOSER_PROMPT = "Choose data file";
     private FileChooser myChooser = makeChooser(DATA_FILE_EXTENSION);
     private Timeline myTime;
@@ -47,17 +49,15 @@ public class Controller_API{
     private Simulation mySimulation;
     private GridPane gridPane;
     private Map<String, String> originalAttributes;
-    private Map<Point, Integer> myMap;
     private Map<Point, Integer> beginningStageMap;
 
-    public Controller_API(GridPane gridPane)
+    public Controller(GridPane gridPane)
     {
         this.gridPane =gridPane;
     }
 
     public void start(){
         var dataFile = myChooser.showOpenDialog(null);
-
         XMLParser parser = new XMLParser(GAME_TYPE);
         Map<String, String> attributes = parser.getAttribute(dataFile);
         originalAttributes = attributes;
@@ -65,7 +65,13 @@ public class Controller_API{
     }
 
     public void setUp(Map<String, String> attributes, boolean isReset){
-        //retrieve parameters needed to build a new Simulation
+        int speed = initializeSimulation(attributes, isReset);
+        myView = new CellGridPane(gridPane);
+        myView.create(attributes, mySimulation);
+        createTime(speed);
+    }
+
+    private int initializeSimulation(Map<String, String> attributes, boolean isReset) {
         int numRows = Integer.parseInt(attributes.get(NUM_ROW_ATTR));
         int numColumns = Integer.parseInt(attributes.get(NUM_COL_ATTR));
         double cellRatio = Double.parseDouble(attributes.getOrDefault(CELL_RATIO, DEFAULT_RATIO));
@@ -75,27 +81,25 @@ public class Controller_API{
         String type = attributes.get(TYPE);
         int sharkRate = Integer.parseInt(attributes.getOrDefault(SHARK_RATE, DEFAULT_SHARK_RATE));
         int fishRate = Integer.parseInt(attributes.getOrDefault(FISH_RATE, DEFAULT_FISH_RATE));
-
         if(isReset){
             mySimulation = getSimulation(numRows, numColumns,type, threshold, beginningStageMap, fishRate, sharkRate);
         }
         else {
-            myMap = simulationMap(numRows, numColumns, cellRatio, emptyRatio);
+            Map<Point, Integer> myMap = simulationMap(numRows, numColumns, cellRatio, emptyRatio);
             beginningStageMap = new HashMap<>(myMap);
             mySimulation = getSimulation(numRows, numColumns, type, threshold, myMap, fishRate, sharkRate);
         }
+        return speed;
+    }
 
-        myView = new CellGridPane(gridPane);
-        myView.create(attributes, mySimulation);
-
+    private void createTime(int speed) {
         if(myTime==null){
-            var frame = new KeyFrame(Duration.millis(FPS_DIVISION/(speed+SPEEDBUFF)),e->step());
+            var frame = new KeyFrame(Duration.millis(FPS_DIVISION/(speed+SPEEDBUFF)), e->step());
             myTime = new Timeline();
             myTime.setCycleCount(Timeline.INDEFINITE);
             myTime.getKeyFrames().add(frame);
             myTime.play();
         }
-
     }
 
     public void update(Map<String, String> map){
@@ -179,11 +183,11 @@ public class Controller_API{
                 int state;
                 double level = r.nextDouble();
                 if (level < emptyRatio)
-                    state = 2;
+                    {state = 2;}
                 else if (level < emptyRatio+(1-emptyRatio)*cellRatio)
-                    state = 0;
+                    {state = 0;}
                 else
-                    state = 1;
+                    {state = 1;}
                 initialState.put(p, state);
             }
         }

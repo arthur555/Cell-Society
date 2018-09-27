@@ -9,7 +9,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -50,7 +49,6 @@ public class XMLParser {
         {
             result.put(nodes.item(i).getNodeName(),nodes.item(i).getTextContent());
         }
-        // read data associated with the fields given by the object
         return result;
     }
 
@@ -61,7 +59,7 @@ public class XMLParser {
             var xmlDocument = DOCUMENT_BUILDER.parse(xmlFile);
             return xmlDocument.getDocumentElement();
         }
-        catch (SAXException | IOException e) {
+        catch (SAXException | IOException | IllegalArgumentException e ) {
             throw new XMLException(e);
         }
     }

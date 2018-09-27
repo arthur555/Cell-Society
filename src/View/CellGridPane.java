@@ -1,6 +1,6 @@
 package View;
 
-import Controller.Controller_API;
+import Controller.Controller;
 import Model.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -27,8 +27,8 @@ public class CellGridPane {
     }
 
     public void create(Map<String, String> attributes, Simulation initialSimulation){
-        numRows = Integer.parseInt(attributes.get(Controller_API.NUM_ROW_ATTR));
-        numCols = Integer.parseInt(attributes.get(Controller_API.NUM_COL_ATTR));
+        numRows = Integer.parseInt(attributes.get(Controller.NUM_ROW_ATTR));
+        numCols = Integer.parseInt(attributes.get(Controller.NUM_COL_ATTR));
         initialize(numRows, numCols, initialSimulation);
     }
 
