@@ -99,9 +99,9 @@ public class Controller_API{
     }
 
     public void update(Map<String, String> map){
-        for(String s: map.keySet())
+        for(Map.Entry s: map.entrySet())
         {
-            originalAttributes.put(s,map.get(s));
+            s.setValue(map.get(s.getKey()));
         }
         setUp(originalAttributes, false);
     }
